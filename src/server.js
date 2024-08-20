@@ -11,7 +11,7 @@ const init = async () => {
   await db.initialize();
   const server = Hapi.server({
     port: process.env.PORT || 3000,
-    host: process.env.SERVER_HOST || '0.0.0.0',
+    host: process.env.SERVER_HOST || 'localhost',
   });
 
   // Register the authentication plugin
@@ -43,6 +43,20 @@ const init = async () => {
     }).code(error.output.statusCode);
   });
   
+
+  // Health Check
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: (request, h) => {
+        return h.response({
+          status: "Health Check Success",
+          date: new Date().toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }),
+          uptime: `${Math.round(process.uptime())} second`
+        }).code(200);
+    }
+  
+  });
 
   server.realm.modifiers.route.prefix = '/api'
   server.route([
